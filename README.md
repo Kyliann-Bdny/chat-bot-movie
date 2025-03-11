@@ -1,4 +1,4 @@
-# Chat-Bot Project
+# Chat-Bot Project for Movie
 
 ## Overview
 The Chat-Bot project is a web application that serves as an intelligent assistant for movie and series recommendations. It utilizes the OpenAI API for natural language processing and the TMDB API for movie information.
