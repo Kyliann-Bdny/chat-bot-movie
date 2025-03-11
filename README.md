@@ -20,6 +20,8 @@ Chat-Bot
 │       └── script.js     # JavaScript for the web application
 ├── app.py                # Main logic for the chatbot
 ├── requirements.txt      # List of dependencies
+├── .env                  # Environment variables
+├── .gitignore            # Git ignore file
 └── README.md             # Project documentation
 ```
 
@@ -38,7 +40,11 @@ Chat-Bot
 
 3. Set up your API keys:
    - Obtain an OpenAI API key and a TMDB API key.
-   - Update the `app.py` file with your API keys.
+   - Create a `.env` file in the root directory and add your keys:
+     ```
+     OPENAI_API_KEY=your_openai_api_key
+     TMDB_API_KEY=your_tmdb_api_key
+     ```
 
 ## Usage
 

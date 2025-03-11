@@ -3,15 +3,20 @@ import openai
 import os
 import re
 from tmdbv3api import TMDb, Movie
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
-# Ajouter ta clé API OpenAI (remplace par ta nouvelle clé)
-os.environ["OPENAI_API_KEY"] = "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"
-openai.api_key = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+TMDB_API_KEY = os.getenv('TMDB_API_KEY')
+
+# Utiliser les clés API des variables d'environnement
+openai.api_key = OPENAI_API_KEY
 
 tmdb = TMDb()
-tmdb.api_key = '52cbbbbb5e39473c7d4a72cdc5816133'  # Remplace par ta clé API TMDB
+tmdb.api_key = TMDB_API_KEY
 tmdb.language = 'fr'  # Résultats en français
 
 movie = Movie()

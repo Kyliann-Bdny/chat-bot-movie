@@ -3,3 +3,4 @@ openai
 tmdbv3api
 flask-cors
 ipywidgets
+python-dotenv
