@@ -5,6 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assistant Netflix</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #chatbot-circle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #00bcd4;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #chatbot-container, #movie-popup {
+            position: fixed;
+            bottom: 20px;
+            width: 400px;
+            height: 600px;
+            background-color: #f3f4f6;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+        }
+
+        #chatbot-container {
+            right: 20px;
+        }
+
+        #movie-popup {
+            right: 440px;
+        }
+
+        #close-chatbot {
+            align-self: flex-end;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="bg-white text-gray-900 font-sans h-screen flex flex-col">
 
@@ -14,33 +56,42 @@
         </div>
     </header>
 
-    <div class="flex-grow flex justify-center items-start px-4 py-6 space-x-6">
-        <!-- Chat Section -->
-        <div class="bg-gray-100 p-6 rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col h-[75vh]">
-            <div class="message-history space-y-4 flex-grow overflow-y-auto p-2" id="message-history" style="max-height: 60vh;"></div>
-            <form id="chat-form" class="mt-4">
-                <input type="text" id="user_input" name="user_input" placeholder="Tapez votre message ici..." required
-                    class="w-full p-3 bg-gray-200 text-gray-900 border border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
-                <button type="submit" class="w-full mt-3 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-400 transition duration-300 shadow-lg">
-                    Envoyer
-                </button>
-            </form>
-        </div>
-        
-        <!-- Movie Info Section -->
-        <div class="bg-gray-200 p-6 rounded-2xl shadow-md w-full max-w-md h-[75vh] overflow-y-auto" id="movie-info">
-        </div>
+    <!-- Chatbot Circle -->
+    <div id="chatbot-circle">
+        <span class="text-white text-2xl">💬</span>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', async function() {
-            const messageHistoryDiv = document.getElementById('message-history');
-            const movieInfoDiv = document.getElementById('movie-info');
 
+    <!-- Chatbot Container -->
+    <div id="chatbot-container" class="bg-gray-100 p-6 rounded-2xl shadow-2xl">
+        <span id="close-chatbot" class="text-gray-900 text-xl">✖</span>
+        <div class="message-history space-y-4 flex-grow overflow-y-auto p-2" id="message-history" style="max-height: 60vh;"></div>
+        <form id="chat-form" class="mt-4">
+            <input type="text" id="user_input" name="user_input" placeholder="Tapez votre message ici..." required
+                class="w-full p-3 bg-gray-200 text-gray-900 border border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
+            <button type="submit" class="w-full mt-3 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-400 transition duration-300 shadow-lg">
+                Envoyer
+            </button>
+        </form>
+    </div>
+
+    <!-- Movie Popup -->
+    <div id="movie-popup" class="bg-gray-100 p-6 rounded-2xl shadow-2xl">
+        <div id="movie-info" class="space-y-4 flex-grow overflow-y-auto p-2" style="max-height: 60vh;"></div>
+    </div>
+
+    <script>
+        document.getElementById('chatbot-circle').addEventListener('click', async function() {
+            document.getElementById('chatbot-container').style.display = 'flex';
+            document.getElementById('chatbot-circle').style.display = 'none';
+
+            const messageHistoryDiv = document.getElementById('message-history');
+
+            // Display initial bot message
             const loadingDots = `<div class='bg-gray-300 text-gray-900 p-3 rounded-lg w-fit max-w-xs self-start' id='loading-dots'>🤖 ChatBot : <span class='dots'>...</span></div>`;
             messageHistoryDiv.innerHTML += loadingDots;
             messageHistoryDiv.scrollTop = messageHistoryDiv.scrollHeight;
 
-            const response = await fetch('/chat', {
+            const initialResponse = await fetch('/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -48,34 +99,21 @@
                 body: JSON.stringify({ user_input: 'Bonjour' })
             });
 
-            const data = await response.json();
+            const initialData = await initialResponse.json();
             document.getElementById('loading-dots').remove();
 
-            if (!data.error) {
-                const botMessage = `<div class='bg-gray-300 text-gray-900 p-3 rounded-lg w-fit max-w-xs self-start'>🤖 ChatBot : ${data.response || 'Aucune réponse trouvée.'}</div>`;
+            if (!initialData.error) {
+                const botMessage = `<div class='bg-gray-300 text-gray-900 p-3 rounded-lg w-fit max-w-xs self-start'>🤖 ChatBot : ${initialData.response || 'Aucune réponse trouvée.'}</div>`;
                 messageHistoryDiv.innerHTML += botMessage;
                 messageHistoryDiv.scrollTop = messageHistoryDiv.scrollHeight;
-                movieInfoDiv.innerHTML = '';
-
-                if (data.movie_info && data.movie_info.length > 0) {
-                    data.movie_info.forEach(movie => {
-                        movieInfoDiv.innerHTML += `
-                            <div class="mt-4 p-4 border border-cyan-400 rounded-lg bg-white shadow-md">
-                                <h3 class="text-xl font-semibold text-gray-900">${movie.title}</h3>
-                                ${movie.image_url ? `<img src="${movie.image_url}" alt="${movie.title}" class="mt-4 w-full object-cover rounded-md shadow-lg">` : ''}
-                                <p class="mt-4 text-gray-700">${movie.overview}</p>
-                            </div>
-                        `;
-                    });
-                }
             }
         });
 
         document.getElementById('chat-form').addEventListener('submit', async function(event) {
             event.preventDefault();
             const userInput = document.getElementById('user_input').value;
-            const movieInfoDiv = document.getElementById('movie-info');
             const messageHistoryDiv = document.getElementById('message-history');
+            const movieInfoDiv = document.getElementById('movie-info');
 
             const userMessage = `<div class='bg-blue-500 text-white p-3 rounded-lg w-fit max-w-xs self-end'>👤 Vous : ${userInput}</div>`;
             messageHistoryDiv.innerHTML += `<div class='flex flex-col space-y-2'>${userMessage}</div>`;
@@ -100,9 +138,9 @@
                 const botMessage = `<div class='bg-gray-300 text-gray-900 p-3 rounded-lg w-fit max-w-xs self-start'>🤖 ChatBot : ${data.response || 'Aucune réponse trouvée.'}</div>`;
                 messageHistoryDiv.innerHTML += botMessage;
                 messageHistoryDiv.scrollTop = messageHistoryDiv.scrollHeight;
-                movieInfoDiv.innerHTML = '';
 
                 if (data.movie_info && data.movie_info.length > 0) {
+                    movieInfoDiv.innerHTML = '';
                     data.movie_info.forEach(movie => {
                         movieInfoDiv.innerHTML += `
                             <div class="mt-4 p-4 border border-cyan-400 rounded-lg bg-white shadow-md">
@@ -112,9 +150,16 @@
                             </div>
                         `;
                     });
+                    document.getElementById('movie-popup').style.display = 'flex';
                 }
             }
             document.getElementById('user_input').value = '';
+        });
+
+        document.getElementById('close-chatbot').addEventListener('click', function() {
+            document.getElementById('chatbot-container').style.display = 'none';
+            document.getElementById('chatbot-circle').style.display = 'flex';
+            document.getElementById('movie-popup').style.display = 'none';
         });
     </script>
 </body>
