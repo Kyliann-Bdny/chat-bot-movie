@@ -13,6 +13,11 @@ The Chat-Bot project is a web application that serves as an intelligent assistan
 Chat-Bot
 ├── templates
 │   └── index.html        # Main HTML interface for the web application
+├── assets
+│   └── css
+│       └── styles.css    # CSS styles for the web application
+│   └── js
+│       └── script.js     # JavaScript for the web application
 ├── app.py                # Main logic for the chatbot
 ├── requirements.txt      # List of dependencies
 └── README.md             # Project documentation
