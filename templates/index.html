@@ -7,7 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/styles.css">
     <style>
-       
+        /* Ajoutez ce style pour aligner le titre et la croix de fermeture sur la même ligne */
+        
     </style>
 </head>
 <body class="bg-white text-gray-900 font-sans h-screen flex flex-col">
@@ -25,7 +26,10 @@
 
     <!-- Chatbot Container -->
     <div id="chatbot-container" class="bg-gray-100 p-6 rounded-2xl shadow-2xl">
-        <span id="close-chatbot" class="text-gray-900 text-xl">✖</span>
+        <div class="header-container">
+            <h2 class="text-2xl font-bold text-gray-900">ChatBot Assistant</h2>
+            <span id="close-chatbot" class="text-gray-900 text-xl cursor-pointer">✖</span>
+        </div>
         <div class="message-history space-y-4 flex-grow overflow-y-auto p-2" id="message-history" style="max-height: 60vh;"></div>
         <form id="chat-form" class="mt-4">
             <input type="text" id="user_input" name="user_input" placeholder="Tapez votre message ici..." required
