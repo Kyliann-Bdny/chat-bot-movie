@@ -1,0 +1,40 @@
+#chatbot-circle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: #00bcd4;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#chatbot-container, #movie-popup {
+    position: fixed;
+    bottom: 20px;
+    width: 400px;
+    height: 600px;
+    background-color: #f3f4f6;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: none;
+    flex-direction: column;
+}
+
+#chatbot-container {
+    right: 20px;
+}
+
+#movie-popup {
+    right: 440px;
+}
+
+#close-chatbot {
+    align-self: flex-end;
+    margin: 10px;
+    cursor: pointer;
+}
