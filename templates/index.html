@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant Netflix</title>
+    <!-- Intégration de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <header class="bg-gray-800 text-white py-6 border-b-4 border-green-500">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold text-center">Assistant Netflix</h1>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="response mt-6" id="response"></div>
+            <div class="message-history mt-6" id="message-history"></div> <!-- Ajout de cette ligne -->
+            <div class="movie-info mt-6" id="movie-info"></div>
+            <form id="chat-form" class="space-y-4">
+                <input type="text" id="user_input" name="user_input" placeholder="Tapez votre message ici..." required
+                    class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                <button type="submit" class="w-full py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-600 transition duration-200">
+                    Envoyer
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('chat-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const userInput = document.getElementById('user_input').value;
+            const responseDiv = document.getElementById('response');
+            const movieInfoDiv = document.getElementById('movie-info');
+            const messageHistoryDiv = document.getElementById('message-history'); // Ajout de cette ligne
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_input: userInput })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                responseDiv.innerHTML = `<p class="text-red-500">Erreur : ${data.error}</p>`;
+            } else {
+                const userMessage = `<p>👤 Vous : ${userInput}</p>`;
+                const botMessage = `<p>🤖 ChatBot : ${data.response || 'Aucune réponse trouvée.'}</p>`;
+                responseDiv.innerHTML = botMessage;
+                messageHistoryDiv.innerHTML += userMessage + botMessage; // Ajout de cette ligne
+                movieInfoDiv.innerHTML = '';
+
+                if (data.movie_info && data.movie_info.length > 0) {
+                    data.movie_info.forEach(movie => {
+                        movieInfoDiv.innerHTML += `
+                            <div class="mt-6 p-4 border rounded-lg shadow-md bg-gray-50">
+                                <h3 class="text-xl font-semibold text-gray-800">${movie.title}</h3>
+                                ${movie.image_url ? `<img src="${movie.image_url}" alt="${movie.title}" class="mt-4 w-24 h-36 object-cover rounded-md">` : ''}
+                                <p class="mt-4 text-gray-600">${movie.overview}</p>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            document.getElementById('user_input').value = '';
+        });
+    </script>
+</body>
+</html>
