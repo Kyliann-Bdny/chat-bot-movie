@@ -4,40 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assistant Netflix</title>
-    <!-- Intégration de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-white text-gray-900 font-sans h-screen flex flex-col">
 
-    <header class="bg-gray-800 text-white py-6 border-b-4 border-green-500">
-        <div class="container mx-auto">
-            <h1 class="text-3xl font-bold text-center">Assistant Netflix</h1>
+    <header class="bg-gray-800 text-white py-4 border-b-4 border-cyan-400 shadow-xl">
+        <div class="container mx-auto text-center">
+            <h1 class="text-3xl font-extrabold tracking-wide">Assistant Netflix</h1>
         </div>
     </header>
 
-    <div class="container mx-auto px-4 py-8">
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-            <div class="response mt-6" id="response"></div>
-            <div class="message-history mt-6" id="message-history"></div> <!-- Ajout de cette ligne -->
-            <div class="movie-info mt-6" id="movie-info"></div>
-            <form id="chat-form" class="space-y-4">
+    <div class="flex-grow flex justify-center items-start px-4 py-6 space-x-6">
+        <!-- Chat Section -->
+        <div class="bg-gray-100 p-6 rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col h-[75vh]">
+            <div class="message-history space-y-4 flex-grow overflow-y-auto p-2" id="message-history" style="max-height: 60vh;"></div>
+            <form id="chat-form" class="mt-4">
                 <input type="text" id="user_input" name="user_input" placeholder="Tapez votre message ici..." required
-                    class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                <button type="submit" class="w-full py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-600 transition duration-200">
+                    class="w-full p-3 bg-gray-200 text-gray-900 border border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                <button type="submit" class="w-full mt-3 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-400 transition duration-300 shadow-lg">
                     Envoyer
                 </button>
             </form>
         </div>
+        
+        <!-- Movie Info Section -->
+        <div class="bg-gray-200 p-6 rounded-2xl shadow-md w-full max-w-md h-[75vh] overflow-y-auto" id="movie-info">
+        </div>
     </div>
-
     <script>
         document.getElementById('chat-form').addEventListener('submit', async function(event) {
             event.preventDefault();
             const userInput = document.getElementById('user_input').value;
-            const responseDiv = document.getElementById('response');
             const movieInfoDiv = document.getElementById('movie-info');
-            const messageHistoryDiv = document.getElementById('message-history'); // Ajout de cette ligne
+            const messageHistoryDiv = document.getElementById('message-history');
 
+            const userMessage = `<div class='bg-blue-500 text-white p-3 rounded-lg w-fit max-w-xs self-end'>👤 Vous : ${userInput}</div>`;
+            messageHistoryDiv.innerHTML += `<div class='flex flex-col space-y-2'>${userMessage}</div>`;
+            messageHistoryDiv.scrollTop = messageHistoryDiv.scrollHeight;
+            
+            const loadingDots = `<div class='bg-gray-300 text-gray-900 p-3 rounded-lg w-fit max-w-xs self-start' id='loading-dots'>🤖 ChatBot : <span class='dots'>...</span></div>`;
+            messageHistoryDiv.innerHTML += loadingDots;
+            messageHistoryDiv.scrollTop = messageHistoryDiv.scrollHeight;
+            
             const response = await fetch('/chat', {
                 method: 'POST',
                 headers: {
@@ -47,29 +55,26 @@
             });
 
             const data = await response.json();
-
-            if (data.error) {
-                responseDiv.innerHTML = `<p class="text-red-500">Erreur : ${data.error}</p>`;
-            } else {
-                const userMessage = `<p>👤 Vous : ${userInput}</p>`;
-                const botMessage = `<p>🤖 ChatBot : ${data.response || 'Aucune réponse trouvée.'}</p>`;
-                responseDiv.innerHTML = botMessage;
-                messageHistoryDiv.innerHTML += userMessage + botMessage; // Ajout de cette ligne
+            document.getElementById('loading-dots').remove();
+            
+            if (!data.error) {
+                const botMessage = `<div class='bg-gray-300 text-gray-900 p-3 rounded-lg w-fit max-w-xs self-start'>🤖 ChatBot : ${data.response || 'Aucune réponse trouvée.'}</div>`;
+                messageHistoryDiv.innerHTML += botMessage;
+                messageHistoryDiv.scrollTop = messageHistoryDiv.scrollHeight;
                 movieInfoDiv.innerHTML = '';
 
                 if (data.movie_info && data.movie_info.length > 0) {
                     data.movie_info.forEach(movie => {
                         movieInfoDiv.innerHTML += `
-                            <div class="mt-6 p-4 border rounded-lg shadow-md bg-gray-50">
-                                <h3 class="text-xl font-semibold text-gray-800">${movie.title}</h3>
-                                ${movie.image_url ? `<img src="${movie.image_url}" alt="${movie.title}" class="mt-4 w-24 h-36 object-cover rounded-md">` : ''}
-                                <p class="mt-4 text-gray-600">${movie.overview}</p>
+                            <div class="mt-4 p-4 border border-cyan-400 rounded-lg bg-white shadow-md">
+                                <h3 class="text-xl font-semibold text-gray-900">${movie.title}</h3>
+                                ${movie.image_url ? `<img src="${movie.image_url}" alt="${movie.title}" class="mt-4 w-full object-cover rounded-md shadow-lg">` : ''}
+                                <p class="mt-4 text-gray-700">${movie.overview}</p>
                             </div>
                         `;
                     });
                 }
             }
-
             document.getElementById('user_input').value = '';
         });
     </script>
