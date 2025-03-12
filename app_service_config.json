@@ -1,0 +1,6 @@
+{
+  "version": "2.0",
+  "startup": {
+    "command": "gunicorn --bind=0.0.0.0 --timeout 600 app:app"
+  }
+}
