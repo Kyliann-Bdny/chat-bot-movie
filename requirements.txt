@@ -1,6 +1,7 @@
 Flask
-openai
+openai==0.28.1
 tmdbv3api
 flask-cors
 ipywidgets
 python-dotenv
+requests
