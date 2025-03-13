@@ -4,9 +4,25 @@ let userProfile = {
     movieHistory: []
 };
 
+// Générer un identifiant unique pour chaque utilisateur
+function generateUserId() {
+    return 'user-' + Math.random().toString(36).substr(2, 9);
+}
+
+// Charger l'identifiant utilisateur depuis le stockage local ou en générer un nouveau
+function getUserId() {
+    let userId = localStorage.getItem('userId');
+    if (!userId) {
+        userId = generateUserId();
+        localStorage.setItem('userId', userId);
+    }
+    return userId;
+}
+
 // Charger le profil utilisateur depuis le stockage local
 function loadUserProfile() {
-    const storedProfile = localStorage.getItem('userProfile');
+    const userId = getUserId();
+    const storedProfile = localStorage.getItem(userId);
     if (storedProfile) {
         userProfile = JSON.parse(storedProfile);
     }
@@ -14,7 +30,8 @@ function loadUserProfile() {
 
 // Sauvegarder le profil utilisateur dans le stockage local
 function saveUserProfile() {
-    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+    const userId = getUserId();
+    localStorage.setItem(userId, JSON.stringify(userProfile));
 }
 
 // Envoyer un message de bienvenue
