@@ -16,7 +16,6 @@
 #chatbot-container, #movie-popup {
     position: fixed;
     bottom: 20px;
-    width: 400px;
     height: 600px;
     background-color: #f3f4f6;
     border-radius: 20px;
@@ -27,10 +26,13 @@
 
 #chatbot-container {
     right: 20px;
+    width: 400px;
 }
 
 #movie-popup {
-    right: 440px;
+    left: 20px;
+    right: calc(20px + 400px + 20px); /* Ajuster la largeur en fonction de la largeur du chatbot et de l'espace entre les deux */
+    width: calc(100% - 460px); /* Ajuster la largeur en fonction de la largeur du chatbot et de l'espace entre les deux */
 }
 
 #close-chatbot {
@@ -50,4 +52,21 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.movie-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.movie-item img {
+    width: 150px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.movie-item .movie-details {
+    flex-grow: 1;
 }

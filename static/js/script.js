@@ -154,10 +154,12 @@ document.getElementById('chat-form').addEventListener('submit', async function(e
             saveUserProfile();
             data.movie_info.forEach(movie => {
                 movieInfoDiv.innerHTML += `
-                    <div class="mt-4 p-4 border border-cyan-400 rounded-lg bg-white shadow-md">
-                        <h3 class="text-xl font-semibold text-gray-900">${movie.title}</h3>
-                        ${movie.image_url ? `<img src="${movie.image_url}" alt="${movie.title}" class="mt-4 w-full object-cover rounded-md shadow-lg">` : ''}
-                        <p class="mt-4 text-gray-700">${movie.overview}</p>
+                    <div class="movie-item mt-4 p-4 border border-cyan-400 rounded-lg bg-white shadow-md">
+                        <img src="${movie.image_url}" alt="${movie.title}">
+                        <div class="movie-details">
+                            <h3 class="text-xl font-semibold text-gray-900">${movie.title}</h3>
+                            <p class="mt-4 text-gray-700">${movie.overview}</p>
+                        </div>
                     </div>
                 `;
             });
