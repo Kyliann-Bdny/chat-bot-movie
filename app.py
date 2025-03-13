@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, make_response
 import openai
 import os
 import re
 from tmdbv3api import TMDb, Movie
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 
@@ -59,9 +60,31 @@ context = [
     )}
 ]
 
+profiles = {}
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/profile', methods=['GET'])
+def get_profile():
+    user_id = request.cookies.get('userId')
+    if not user_id:
+        user_id = 'user-' + os.urandom(16).hex()
+        profiles[user_id] = {"messages": [], "movieHistory": []}
+        response = make_response(jsonify({"userId": user_id, "userProfile": profiles[user_id]}))
+        response.set_cookie('userId', user_id, max_age=365*24*60*60)
+        return response
+    user_profile = profiles.get(user_id, {"messages": [], "movieHistory": []})
+    return jsonify({"userId": user_id, "userProfile": user_profile})
+
+@app.route('/profile', methods=['POST'])
+def save_profile():
+    data = request.get_json()
+    user_id = data.get('userId')
+    user_profile = data.get('userProfile')
+    profiles[user_id] = user_profile
+    return jsonify({"status": "success"})
 
 @app.route('/chat', methods=['POST'])
 def chat():

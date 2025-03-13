@@ -3,35 +3,65 @@ let userProfile = {
     messages: [],
     movieHistory: []
 };
+let userId = '';
 
 // Générer un identifiant unique pour chaque utilisateur
 function generateUserId() {
     return 'user-' + Math.random().toString(36).substr(2, 9);
 }
 
-// Charger l'identifiant utilisateur depuis le stockage local ou en générer un nouveau
+// Définir un cookie
+function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
+
+// Obtenir un cookie
+function getCookie(name) {
+    const cname = name + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(cname) == 0) {
+            return c.substring(cname.length, c.length);
+        }
+    }
+    return "";
+}
+
+// Charger l'identifiant utilisateur depuis les cookies ou en générer un nouveau
 function getUserId() {
-    let userId = localStorage.getItem('userId');
+    let userId = getCookie('userId');
     if (!userId) {
         userId = generateUserId();
-        localStorage.setItem('userId', userId);
+        setCookie('userId', userId, 365);
     }
     return userId;
 }
 
-// Charger le profil utilisateur depuis le stockage local
-function loadUserProfile() {
-    const userId = getUserId();
-    const storedProfile = localStorage.getItem(userId);
-    if (storedProfile) {
-        userProfile = JSON.parse(storedProfile);
-    }
+// Charger le profil utilisateur depuis le serveur
+async function loadUserProfile() {
+    const response = await fetch('/profile');
+    const data = await response.json();
+    userId = data.userId;
+    userProfile = data.userProfile;
 }
 
-// Sauvegarder le profil utilisateur dans le stockage local
-function saveUserProfile() {
-    const userId = getUserId();
-    localStorage.setItem(userId, JSON.stringify(userProfile));
+// Sauvegarder le profil utilisateur sur le serveur
+async function saveUserProfile() {
+    await fetch('/profile', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId, userProfile })
+    });
 }
 
 // Envoyer un message de bienvenue
@@ -66,10 +96,10 @@ async function sendWelcomeMessage() {
     }
 }
 
-document.getElementById('chatbot-circle').addEventListener('click', function() {
+document.getElementById('chatbot-circle').addEventListener('click', async function() {
     document.getElementById('chatbot-container').style.display = 'flex';
     document.getElementById('chatbot-circle').style.display = 'none';
-    loadUserProfile();
+    await loadUserProfile();
     sendWelcomeMessage();
 });
 
