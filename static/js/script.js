@@ -170,7 +170,7 @@ document.getElementById('chat-form').addEventListener('submit', async function(e
     }
     document.getElementById('user_input').value = '';
 });
-// Fermer le chatbot
+// Fermer le chatbot lors du clic sur le bouton de fermeture
 document.getElementById('close-chatbot').addEventListener('click', function() {
     document.getElementById('chatbot-container').style.display = 'none';
     document.getElementById('chatbot-circle').style.display = 'flex';
