@@ -96,6 +96,7 @@ async function sendWelcomeMessage() {
     }
 }
 
+// Ouvrir le chatbot lors du clic sur le cercle
 document.getElementById('chatbot-circle').addEventListener('click', async function() {
     document.getElementById('chatbot-container').style.display = 'flex';
     document.getElementById('chatbot-circle').style.display = 'none';
@@ -103,6 +104,7 @@ document.getElementById('chatbot-circle').addEventListener('click', async functi
     sendWelcomeMessage();
 });
 
+// Afficher les messages de l'historique de chat, celle du bot et de l'utilisateur et afficher les films
 document.getElementById('chat-form').addEventListener('submit', async function(event) {
     event.preventDefault();
     const userInput = document.getElementById('user_input').value;
@@ -168,7 +170,7 @@ document.getElementById('chat-form').addEventListener('submit', async function(e
     }
     document.getElementById('user_input').value = '';
 });
-
+// Fermer le chatbot
 document.getElementById('close-chatbot').addEventListener('click', function() {
     document.getElementById('chatbot-container').style.display = 'none';
     document.getElementById('chatbot-circle').style.display = 'flex';

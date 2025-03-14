@@ -22,6 +22,7 @@ tmdb.language = 'fr'  # Résultats en français
 
 movie = Movie()
 
+# Contexte de la conversation
 context = [
     {"role": "system", "content": (
         "Tu es un assistant intelligent et amical qui aide les utilisateurs à choisir un film ou une série sur Netflix. "
@@ -62,6 +63,7 @@ context = [
 
 profiles = {}
 
+# Routes de l'application Flask
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -127,5 +129,6 @@ def chat():
     except Exception as e:
         return jsonify({'error': str(e)})
 
+# Lancer l'application Flask
 if __name__ == '__main__':
     app.run(debug=True)
